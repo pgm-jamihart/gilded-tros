@@ -3,9 +3,9 @@ import { Item } from "./item";
 export class GildedTros {
 	constructor(public items: Array<Item>) {}
 
-    /**
-     * Item type detection
-     */
+	/**
+	 * Item type detection
+	 */
 	private isLegendaryItem(item: Item): boolean {
 		return item.name === "B-DAWG Keychain";
 	}
@@ -21,9 +21,9 @@ export class GildedTros {
 		);
 	}
 
-    /**
-     * Quality + SellIn managment 
-     */
+	/**
+	 * Quality + SellIn managment
+	 */
 	private increaseQuality(item: Item): void {
 		item.quality = item.quality + 1;
 
@@ -50,9 +50,9 @@ export class GildedTros {
 		item.quality = item.quality - item.quality;
 	}
 
-    /**
-     * Update item Quality 
-     */
+	/**
+	 * Update item Quality
+	 */
 	public updateQuality(): void {
 		for (let i = 0; i < this.items.length; i++) {
 			/**
@@ -71,33 +71,27 @@ export class GildedTros {
 				if (!this.isLegendaryItem(this.items[i])) {
 					this.decreaseQuality(this.items[i]);
 				}
-				/**
-				 * Q is less than 50
-				 * item is 'Good Wine' or 'Backstage passes'
-				 * -> Q: +1
-				 */
-			} else {
+			} else if (this.isGoodWine(this.items[i])) {
+				// item is 'Good Wine' -> Q: +1
+				this.increaseQuality(this.items[i]);
+			} else if (this.isBackstagePass(this.items[i])) {
+				// item is 'Backstage passes' -> Q: +1
 				this.increaseQuality(this.items[i]);
 
 				/**
-				 * item is 'Backstage passes'
+				 * SellIn less than 11 + Q less than 50
+				 * -> Q: +1 (= becomes 2)
 				 */
-				if (this.isBackstagePass(this.items[i])) {
-					/**
-					 * SellIn less than 11 + Q less than 50
-					 * -> Q: +1 (= becomes 2)
-					 */
-					if (this.items[i].sellIn < 11) {
-						this.increaseQuality(this.items[i]);
-					}
+				if (this.items[i].sellIn < 11) {
+					this.increaseQuality(this.items[i]);
+				}
 
-					/**
-					 * SellIn less than 6 + Q less than 50
-					 * -> Q: +1 (= becomes 3)
-					 */
-					if (this.items[i].sellIn < 6) {
-						this.increaseQuality(this.items[i]);
-					}
+				/**
+				 * SellIn less than 6 + Q less than 50
+				 * -> Q: +1 (= becomes 3)
+				 */
+				if (this.items[i].sellIn < 6) {
+					this.increaseQuality(this.items[i]);
 				}
 			}
 
@@ -115,18 +109,20 @@ export class GildedTros {
 				 * -> Q: -1 (= becomes -2)
 				 */
 				if (!this.isGoodWine(this.items[i])) {
-					if (!this.isBackstagePass(this.items[i])) {
-						if (!this.isLegendaryItem(this.items[i])) {
-							this.decreaseQuality(this.items[i]);
-						}
-					} else {
-						/**
-						 * Item is 'Backstage passes'
-						 * -> Sellin overdue -> Q = 0
-						 */
-						this.resetQuality(this.items[i]);
+					if (!this.isLegendaryItem(this.items[i])) {
+						this.decreaseQuality(this.items[i]);
 					}
-				} else {
+				}
+
+				if (this.isBackstagePass(this.items[i])) {
+					/**
+					 * Item is 'Backstage passes'
+					 * -> Sellin overdue -> Q = 0
+					 */
+					this.resetQuality(this.items[i]);
+				}
+
+				if (this.isGoodWine(this.items[i])) {
 					/**
 					 * Item is 'Good Wine' and Q less than 50
 					 * Q: +1 (= becomes +2)
