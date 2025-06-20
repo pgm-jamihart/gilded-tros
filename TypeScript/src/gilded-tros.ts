@@ -82,7 +82,7 @@ export class GildedTros {
 				if (this.items[i].name != "Good Wine") {
 					if (
 						this.items[i].name !=
-							"Backstage passes for Re:Factor" ||
+							"Backstage passes for Re:Factor" &&
 						this.items[i].name != "Backstage passes for HAXX"
 					) {
 						if (this.items[i].quality > 0) {
