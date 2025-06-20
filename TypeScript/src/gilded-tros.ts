@@ -3,6 +3,21 @@ import { Item } from "./item";
 export class GildedTros {
 	constructor(public items: Array<Item>) {}
 
+	private isLegendaryItem(item: Item): boolean {
+		return item.name === "B-DAWG Keychain";
+	}
+
+	private isGoodWine(item: Item): boolean {
+		return item.name === "Good Wine";
+	}
+
+	private isBackstagePass(item: Item): boolean {
+		return (
+			item.name === "Backstage passes for Re:Factor" ||
+			item.name === "Backstage passes for HAXX"
+		);
+	}
+
 	public updateQuality(): void {
 		for (let i = 0; i < this.items.length; i++) {
 			/**
@@ -10,9 +25,8 @@ export class GildedTros {
 			 * -> Q: -1
 			 */
 			if (
-				this.items[i].name != "Good Wine" &&
-				this.items[i].name != "Backstage passes for Re:Factor" &&
-				this.items[i].name != "Backstage passes for HAXX"
+				!this.isGoodWine(this.items[i]) &&
+				!this.isBackstagePass(this.items[i])
 			) {
 				/**
 				 * Q is greater than 0
@@ -20,7 +34,7 @@ export class GildedTros {
 				 * -> Q: -1
 				 */
 				if (this.items[i].quality > 0) {
-					if (this.items[i].name != "B-DAWG Keychain") {
+					if (!this.isLegendaryItem(this.items[i])) {
 						this.items[i].quality = this.items[i].quality - 1;
 					}
 				}
@@ -36,9 +50,7 @@ export class GildedTros {
 					/**
 					 * item is 'Backstage passes'
 					 */
-					if (
-						this.items[i].name == "Backstage passes for Re:Factor"
-					) {
+					if (this.isBackstagePass(this.items[i])) {
 						/**
 						 * SellIn less than 11 + Q less than 50
 						 * -> Q: +1 (= becomes 2)
@@ -67,7 +79,7 @@ export class GildedTros {
 			/**
 			 * If not legendary item -> Sellin: -1
 			 */
-			if (this.items[i].name != "B-DAWG Keychain") {
+			if (!this.isLegendaryItem(this.items[i])) {
 				this.items[i].sellIn = this.items[i].sellIn - 1;
 			}
 
@@ -79,14 +91,10 @@ export class GildedTros {
 				 * If item is normal and Q is more than 0
 				 * -> Q: -1 (= becomes -2)
 				 */
-				if (this.items[i].name != "Good Wine") {
-					if (
-						this.items[i].name !=
-							"Backstage passes for Re:Factor" &&
-						this.items[i].name != "Backstage passes for HAXX"
-					) {
+				if (!this.isGoodWine(this.items[i])) {
+					if (!this.isBackstagePass(this.items[i])) {
 						if (this.items[i].quality > 0) {
-							if (this.items[i].name != "B-DAWG Keychain") {
+							if (!this.isLegendaryItem(this.items[i])) {
 								this.items[i].quality =
 									this.items[i].quality - 1;
 							}
