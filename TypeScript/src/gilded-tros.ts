@@ -1,63 +1,158 @@
-import {Item} from './item';
+import { Item } from "./item";
 
 export class GildedTros {
+	constructor(public items: Array<Item>) {}
 
-    constructor(public items: Array<Item>) {
+	/**
+	 * Item type detection
+	 */
+	private isLegendaryItem(item: Item): boolean {
+		return item.name === "B-DAWG Keychain";
+	}
 
-    }
+	private isGoodWine(item: Item): boolean {
+		return item.name === "Good Wine";
+	}
 
-    public updateQuality(): void {
-        for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].name != 'Good Wine' && this.items[i].name != 'Backstage passes for Re:Factor'
-                && this.items[i].name != 'Backstage passes for HAXX') {
-                if (this.items[i].quality > 0) {
-                    if (this.items[i].name != 'B-DAWG Keychain') {
-                        this.items[i].quality = this.items[i].quality - 1;
-                    }
-                }
-            } else {
-                if (this.items[i].quality < 50) {
-                    this.items[i].quality = this.items[i].quality + 1;
+	private isBackstagePass(item: Item): boolean {
+		return (
+			item.name === "Backstage passes for Re:Factor" ||
+			item.name === "Backstage passes for HAXX"
+		);
+	}
 
-                    if (this.items[i].name == 'Backstage passes for Re:Factor') {
-                        if (this.items[i].sellIn < 11) {
-                            if (this.items[i].quality < 50) {
-                                this.items[i].quality = this.items[i].quality + 1;
-                            }
-                        }
+	private isSmellyItem(item: Item): boolean {
+		return (
+			item.name === "Duplicate Code" ||
+			item.name === "Long Methods" ||
+			item.name === "Ugly Variable Names"
+		);
+	}
 
-                        if (this.items[i].sellIn < 6) {
-                            if (this.items[i].quality < 50) {
-                                this.items[i].quality = this.items[i].quality + 1;
-                            }
-                        }
-                    }
-                }
-            }
+	private isNormalItem(item: Item): boolean {
+		return (
+			!this.isLegendaryItem(item) &&
+			!this.isGoodWine(item) &&
+			!this.isBackstagePass(item) &&
+			!this.isSmellyItem(item)
+		);
+	}
 
-            if (this.items[i].name != 'B-DAWG Keychain') {
-                this.items[i].sellIn = this.items[i].sellIn - 1;
-            }
+	/**
+	 * Quality + SellIn managment
+	 */
+	private increaseQuality(item: Item): void {
+		item.quality = item.quality + 1;
 
-            if (this.items[i].sellIn < 0) {
-                if (this.items[i].name != 'Good Wine') {
-                    if (this.items[i].name != 'Backstage passes for Re:Factor' || this.items[i].name != 'Backstage passes for HAXX') {
-                        if (this.items[i].quality > 0) {
-                            if (this.items[i].name != 'B-DAWG Keychain') {
-                                this.items[i].quality = this.items[i].quality - 1;
-                            }
-                        }
-                    } else {
-                        this.items[i].quality = this.items[i].quality - this.items[i].quality;
-                    }
-                } else {
-                    if (this.items[i].quality < 50) {
-                        this.items[i].quality = this.items[i].quality + 1;
-                    }
-                }
-            }
-        }
-    }
+		if (item.quality > 50) {
+			item.quality = 50;
+		}
+	}
 
+	private decreaseQuality(item: Item, amount: number = 1): void {
+		item.quality = item.quality - amount;
+
+		if (item.quality < 0) {
+			item.quality = 0;
+		}
+	}
+
+	private decreaseSellIn(item: Item): void {
+		if (!this.isLegendaryItem(item)) {
+			item.sellIn = item.sellIn - 1;
+		}
+	}
+
+	private resetQuality(item: Item): void {
+		item.quality = item.quality - item.quality;
+	}
+
+	/**
+	 * Quality update logic per type
+	 */
+	private updateNormalItem(item: Item): void {
+		/**
+		 * Normal item
+		 * -> Q: -1
+		 * if sellIn < 0 -> Q: -2
+		 */
+
+		this.decreaseQuality(item);
+
+		if (item.sellIn < 0) {
+			this.decreaseQuality(item);
+		}
+	}
+
+	private updateGoodWine(item: Item): void {
+		/**
+		 * Good wine
+		 * -> Q: +1
+		 * if sellIn < 0 -> Q: +2
+		 */
+		this.increaseQuality(item);
+
+		if (item.sellIn < 0) {
+			this.increaseQuality(item);
+		}
+	}
+
+	private updateBackstagePass(item: Item): void {
+		/**
+		 * Backstage passes
+		 * -> Q: +1
+		 *
+		 * if sellIn < 11 -> Q: +2
+		 * if sellIn < 6 -> Q: +3
+		 * if sellIn < 0 -> Q = 0
+		 */
+		this.increaseQuality(item);
+
+		if (item.sellIn < 11) {
+			this.increaseQuality(item);
+		}
+
+		if (item.sellIn < 6) {
+			this.increaseQuality(item);
+		}
+
+		if (item.sellIn < 0) {
+			this.resetQuality(item);
+		}
+	}
+
+	private updateSmellyItem(item: Item): void {
+		/**
+		 * Smelly item
+		 * -> Q: -2
+		 * if sellIn < 0 -> Q: -4
+		 */
+		this.decreaseQuality(item, 2);
+
+		if (item.sellIn < 0) {
+			this.decreaseQuality(item, 2);
+		}
+	}
+
+	/**
+	 * Update item Quality
+	 */
+	public updateQuality(): void {
+		for (let i = 0; i < this.items.length; i++) {
+			/**
+			 * If not legendary item -> Sellin: -1
+			 */
+			this.decreaseSellIn(this.items[i]);
+
+			if (this.isNormalItem(this.items[i])) {
+				this.updateNormalItem(this.items[i]);
+			} else if (this.isGoodWine(this.items[i])) {
+				this.updateGoodWine(this.items[i]);
+			} else if (this.isBackstagePass(this.items[i])) {
+				this.updateBackstagePass(this.items[i]);
+			} else if (this.isSmellyItem(this.items[i])) {
+				this.updateSmellyItem(this.items[i]);
+			}
+		}
+	}
 }
-
