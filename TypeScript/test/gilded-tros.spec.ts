@@ -134,4 +134,26 @@ describe("GildedTrosTest", () => {
 			expect(items[0].quality).toBe(50);
 		});
 	});
+
+	describe("Smelly items", () => {
+		it("Smelly item should decrease by 2 before sellIn and sellIn should decrease by 1 per day", () => {
+			const items: Item[] = [new Item("Duplicate Code", 3, 6)];
+			const app: GildedTros = new GildedTros(items);
+
+			app.updateQuality();
+
+			expect(items[0].sellIn).toBe(2);
+			expect(items[0].quality).toBe(4);
+		});
+
+		it("Smelly item should decrease by 4 after sellIn and sellIn should decrease by 1 per day", () => {
+			const items: Item[] = [new Item("Long Methods", 0, 6)];
+			const app: GildedTros = new GildedTros(items);
+
+			app.updateQuality();
+
+			expect(items[0].sellIn).toBe(-1);
+			expect(items[0].quality).toBe(2);
+		});
+	});
 });

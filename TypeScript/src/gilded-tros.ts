@@ -21,11 +21,20 @@ export class GildedTros {
 		);
 	}
 
+	private isSmellyItem(item: Item): boolean {
+		return (
+			item.name === "Duplicate Code" ||
+			item.name === "Long Methods" ||
+			item.name === "Ugly Variable Names"
+		);
+	}
+
 	private isNormalItem(item: Item): boolean {
 		return (
 			!this.isLegendaryItem(item) &&
 			!this.isGoodWine(item) &&
-			!this.isBackstagePass(item)
+			!this.isBackstagePass(item) &&
+			!this.isSmellyItem(item)
 		);
 	}
 
@@ -40,8 +49,8 @@ export class GildedTros {
 		}
 	}
 
-	private decreaseQuality(item: Item): void {
-		item.quality = item.quality - 1;
+	private decreaseQuality(item: Item, amount: number = 1): void {
+		item.quality = item.quality - amount;
 
 		if (item.quality < 0) {
 			item.quality = 0;
@@ -112,6 +121,19 @@ export class GildedTros {
 		}
 	}
 
+	private updateSmellyItem(item: Item): void {
+		/**
+		 * Smelly item
+		 * -> Q: -2
+		 * if sellIn < 0 -> Q: -4
+		 */
+		this.decreaseQuality(item, 2);
+
+		if (item.sellIn < 0) {
+			this.decreaseQuality(item, 2);
+		}
+	}
+
 	/**
 	 * Update item Quality
 	 */
@@ -128,6 +150,8 @@ export class GildedTros {
 				this.updateGoodWine(this.items[i]);
 			} else if (this.isBackstagePass(this.items[i])) {
 				this.updateBackstagePass(this.items[i]);
+			} else if (this.isSmellyItem(this.items[i])) {
+				this.updateSmellyItem(this.items[i]);
 			}
 		}
 	}
