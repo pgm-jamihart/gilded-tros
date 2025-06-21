@@ -59,6 +59,60 @@ export class GildedTros {
 	}
 
 	/**
+	 * Quality update logic per type
+	 */
+	private updateNormalItem(item: Item): void {
+		/**
+		 * Normal item
+		 * -> Q: -1
+		 * if sellIn < 0 -> Q: -2
+		 */
+
+		this.decreaseQuality(item);
+
+		if (item.sellIn < 0) {
+			this.decreaseQuality(item);
+		}
+	}
+
+	private updateGoodWine(item: Item): void {
+		/**
+		 * Good wine
+		 * -> Q: +1
+		 * if sellIn < 0 -> Q: +2
+		 */
+		this.increaseQuality(item);
+
+		if (item.sellIn < 0) {
+			this.increaseQuality(item);
+		}
+	}
+
+	private updateBackstagePass(item: Item): void {
+		/**
+		 * Backstage passes
+		 * -> Q: +1
+		 *
+		 * if sellIn < 11 -> Q: +2
+		 * if sellIn < 6 -> Q: +3
+		 * if sellIn < 0 -> Q = 0
+		 */
+		this.increaseQuality(item);
+
+		if (item.sellIn < 11) {
+			this.increaseQuality(item);
+		}
+
+		if (item.sellIn < 6) {
+			this.increaseQuality(item);
+		}
+
+		if (item.sellIn < 0) {
+			this.resetQuality(item);
+		}
+	}
+
+	/**
 	 * Update item Quality
 	 */
 	public updateQuality(): void {
@@ -69,51 +123,11 @@ export class GildedTros {
 			this.decreaseSellIn(this.items[i]);
 
 			if (this.isNormalItem(this.items[i])) {
-				/**
-				 * Normal item
-				 * -> Q: -1
-				 * if sellIn < 0 -> Q: -2
-				 */
-
-				this.decreaseQuality(this.items[i]);
-
-				if (this.items[i].sellIn < 0) {
-					this.decreaseQuality(this.items[i]);
-				}
+				this.updateNormalItem(this.items[i]);
 			} else if (this.isGoodWine(this.items[i])) {
-				/**
-				 * Good wine
-				 * -> Q: +1
-				 * if sellIn < 0 -> Q: +2
-				 */
-				this.increaseQuality(this.items[i]);
-
-				if (this.items[i].sellIn < 0) {
-					this.increaseQuality(this.items[i]);
-				}
+				this.updateGoodWine(this.items[i]);
 			} else if (this.isBackstagePass(this.items[i])) {
-				/**
-				 * Backstage passes
-				 * -> Q: +1
-                 * 
-                 * if sellIn < 11 -> Q: +2
-                 * if sellIn < 6 -> Q: +3
-                 * if sellIn < 0 -> Q = 0
-
-				 */
-				this.increaseQuality(this.items[i]);
-
-				if (this.items[i].sellIn < 11) {
-					this.increaseQuality(this.items[i]);
-				}
-
-				if (this.items[i].sellIn < 6) {
-					this.increaseQuality(this.items[i]);
-				}
-
-				if (this.items[i].sellIn < 0) {
-					this.resetQuality(this.items[i]);
-				}
+				this.updateBackstagePass(this.items[i]);
 			}
 		}
 	}
