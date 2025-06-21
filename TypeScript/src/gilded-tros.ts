@@ -64,66 +64,55 @@ export class GildedTros {
 	public updateQuality(): void {
 		for (let i = 0; i < this.items.length; i++) {
 			/**
-			 * Normal item
-			 * -> Q: -1
-			 */
-			if (this.isNormalItem(this.items[i])) {
-				this.decreaseQuality(this.items[i]);
-			} else if (this.isGoodWine(this.items[i])) {
-				// item is 'Good Wine' -> Q: +1
-				this.increaseQuality(this.items[i]);
-			} else if (this.isBackstagePass(this.items[i])) {
-				// item is 'Backstage passes' -> Q: +1
-				this.increaseQuality(this.items[i]);
-
-				/**
-				 * SellIn less than 11 + Q less than 50
-				 * -> Q: +1 (= becomes 2)
-				 */
-				if (this.items[i].sellIn < 11) {
-					this.increaseQuality(this.items[i]);
-				}
-
-				/**
-				 * SellIn less than 6 + Q less than 50
-				 * -> Q: +1 (= becomes 3)
-				 */
-				if (this.items[i].sellIn < 6) {
-					this.increaseQuality(this.items[i]);
-				}
-			}
-
-			/**
 			 * If not legendary item -> Sellin: -1
 			 */
 			this.decreaseSellIn(this.items[i]);
 
-			/**
-			 * Sellin overdue
-			 */
-			if (this.items[i].sellIn < 0) {
+			if (this.isNormalItem(this.items[i])) {
 				/**
-				 * If item is normal and Q is more than 0
-				 * -> Q: -1 (= becomes -2)
+				 * Normal item
+				 * -> Q: -1
+				 * if sellIn < 0 -> Q: -2
 				 */
-				if (this.isNormalItem(this.items[i])) {
+
+				this.decreaseQuality(this.items[i]);
+
+				if (this.items[i].sellIn < 0) {
 					this.decreaseQuality(this.items[i]);
 				}
+			} else if (this.isGoodWine(this.items[i])) {
+				/**
+				 * Good wine
+				 * -> Q: +1
+				 * if sellIn < 0 -> Q: +2
+				 */
+				this.increaseQuality(this.items[i]);
 
-				if (this.isBackstagePass(this.items[i])) {
-					/**
-					 * Item is 'Backstage passes'
-					 * -> Sellin overdue -> Q = 0
-					 */
-					this.resetQuality(this.items[i]);
+				if (this.items[i].sellIn < 0) {
+					this.increaseQuality(this.items[i]);
+				}
+			} else if (this.isBackstagePass(this.items[i])) {
+				/**
+				 * Backstage passes
+				 * -> Q: +1
+                 * 
+                 * if sellIn < 11 -> Q: +2
+                 * if sellIn < 6 -> Q: +3
+                 * if sellIn < 0 -> Q = 0
+
+				 */
+				this.increaseQuality(this.items[i]);
+
+				if (this.items[i].sellIn < 11) {
+					this.increaseQuality(this.items[i]);
 				}
 
-				if (this.isGoodWine(this.items[i])) {
-					/**
-					 * Item is 'Good Wine' and Q less than 50
-					 * Q: +1 (= becomes +2)
-					 */
+				if (this.items[i].sellIn < 6) {
 					this.increaseQuality(this.items[i]);
+				}
+
+				if (this.items[i].sellIn < 0) {
+					this.resetQuality(this.items[i]);
 				}
 			}
 		}
