@@ -21,6 +21,14 @@ export class GildedTros {
 		);
 	}
 
+	private isNormalItem(item: Item): boolean {
+		return (
+			!this.isLegendaryItem(item) &&
+			!this.isGoodWine(item) &&
+			!this.isBackstagePass(item)
+		);
+	}
+
 	/**
 	 * Quality + SellIn managment
 	 */
@@ -56,21 +64,11 @@ export class GildedTros {
 	public updateQuality(): void {
 		for (let i = 0; i < this.items.length; i++) {
 			/**
-			 * NOT 'Good Wine' or 'Backstage passes'
+			 * Normal item
 			 * -> Q: -1
 			 */
-			if (
-				!this.isGoodWine(this.items[i]) &&
-				!this.isBackstagePass(this.items[i])
-			) {
-				/**
-				 * Q is greater than 0
-				 * Not legendary
-				 * -> Q: -1
-				 */
-				if (!this.isLegendaryItem(this.items[i])) {
-					this.decreaseQuality(this.items[i]);
-				}
+			if (this.isNormalItem(this.items[i])) {
+				this.decreaseQuality(this.items[i]);
 			} else if (this.isGoodWine(this.items[i])) {
 				// item is 'Good Wine' -> Q: +1
 				this.increaseQuality(this.items[i]);
@@ -108,10 +106,8 @@ export class GildedTros {
 				 * If item is normal and Q is more than 0
 				 * -> Q: -1 (= becomes -2)
 				 */
-				if (!this.isGoodWine(this.items[i])) {
-					if (!this.isLegendaryItem(this.items[i])) {
-						this.decreaseQuality(this.items[i]);
-					}
+				if (this.isNormalItem(this.items[i])) {
+					this.decreaseQuality(this.items[i]);
 				}
 
 				if (this.isBackstagePass(this.items[i])) {
