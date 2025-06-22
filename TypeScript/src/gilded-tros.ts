@@ -1,6 +1,16 @@
 import { Item } from "./item";
 
 export class GildedTros {
+	/**
+	 * Constants
+	 */
+	private readonly MAX_QUALITY = 50;
+	private readonly MIN_QUALITY = 0;
+	private readonly BACK_STAGE_SECOND_WAVE = 11;
+	private readonly BACK_STAGE_THIRD_WAVE = 6;
+	private readonly SELLIN_EXPIRED = 0;
+	private readonly SMELLY_ITEM_DECREASE = 2;
+
 	constructor(public items: Array<Item>) {}
 
 	/**
@@ -44,16 +54,16 @@ export class GildedTros {
 	private increaseQuality(item: Item): void {
 		item.quality = item.quality + 1;
 
-		if (item.quality > 50) {
-			item.quality = 50;
+		if (item.quality > this.MAX_QUALITY) {
+			item.quality = this.MAX_QUALITY;
 		}
 	}
 
 	private decreaseQuality(item: Item, amount: number = 1): void {
 		item.quality = item.quality - amount;
 
-		if (item.quality < 0) {
-			item.quality = 0;
+		if (item.quality < this.MIN_QUALITY) {
+			item.quality = this.MIN_QUALITY;
 		}
 	}
 
@@ -79,7 +89,7 @@ export class GildedTros {
 
 		this.decreaseQuality(item);
 
-		if (item.sellIn < 0) {
+		if (item.sellIn < this.SELLIN_EXPIRED) {
 			this.decreaseQuality(item);
 		}
 	}
@@ -92,7 +102,7 @@ export class GildedTros {
 		 */
 		this.increaseQuality(item);
 
-		if (item.sellIn < 0) {
+		if (item.sellIn < this.SELLIN_EXPIRED) {
 			this.increaseQuality(item);
 		}
 	}
@@ -108,15 +118,15 @@ export class GildedTros {
 		 */
 		this.increaseQuality(item);
 
-		if (item.sellIn < 11) {
+		if (item.sellIn < this.BACK_STAGE_SECOND_WAVE) {
 			this.increaseQuality(item);
 		}
 
-		if (item.sellIn < 6) {
+		if (item.sellIn < this.BACK_STAGE_THIRD_WAVE) {
 			this.increaseQuality(item);
 		}
 
-		if (item.sellIn < 0) {
+		if (item.sellIn < this.SELLIN_EXPIRED) {
 			this.resetQuality(item);
 		}
 	}
@@ -127,10 +137,10 @@ export class GildedTros {
 		 * -> Q: -2
 		 * if sellIn < 0 -> Q: -4
 		 */
-		this.decreaseQuality(item, 2);
+		this.decreaseQuality(item, this.SMELLY_ITEM_DECREASE);
 
-		if (item.sellIn < 0) {
-			this.decreaseQuality(item, 2);
+		if (item.sellIn < this.SELLIN_EXPIRED) {
+			this.decreaseQuality(item, this.SMELLY_ITEM_DECREASE);
 		}
 	}
 
